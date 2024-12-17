@@ -1,0 +1,29 @@
+
+$tools-window-background: #bcc2be
+$main-margin: 15px
+$full-backgroud-color: #e6e9ed
+$base-radius: 15px
+$base-padding: 8px
+$tools-window-height: 60px
+body
+    background-color: $full-backgroud-color
+.start-window 
+    height: calc( 100vh - 2*$main-margin )
+    margin: $main-margin
+
+.tools-window
+    height: $tools-window-height
+    background-color: $tools-window-background
+    border-radius: $base-radius
+    padding: $base-padding
+
+.whiteboard
+    margin-top: $main-margin
+    background-color: white
+    height: calc( 100vh -  (3*$main-margin + 2*$base-padding + $tools-window-height))
+    border-radius: 5px
+
+.main-canvas
+    height: 100%
+    width: 100%
+    
