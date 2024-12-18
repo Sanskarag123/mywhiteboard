@@ -3,8 +3,8 @@ $tools-window-background: #bcc2be
 $main-margin: 15px
 $full-backgroud-color: #e6e9ed
 $base-radius: 15px
-$base-padding: 8px
-$tools-window-height: 60px
+$base-padding: 15px
+$tools-window-height: 40px
 body
     background-color: $full-backgroud-color
 .start-window 
@@ -22,8 +22,19 @@ body
     background-color: white
     height: calc( 100vh -  (3*$main-margin + 2*$base-padding + $tools-window-height))
     border-radius: 5px
+    cursor: crosshair
 
-.main-canvas
-    height: 100%
-    width: 100%
+.tool-button
+    padding-top: 10px
+    padding-bottom: 10px
+    height: calc($tools-window-height - 2*10px)
+    width: $tools-window-height
+    text-align: center
+    background-color: white
+    border-radius: $base-radius/2
+
+
+.flex-container
+    display: flex
+
     

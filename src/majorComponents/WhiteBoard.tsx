@@ -3,7 +3,7 @@ import WhiteBoardCanvas from "./WhiteBoardCanvas";
 
 export default function WhiteBoard() {
     return(
-        <div className="whiteboard">
+        <div className="whiteboard" id="whiteboard-area">
             <WhiteBoardCanvas></WhiteBoardCanvas>
         </div>
     )

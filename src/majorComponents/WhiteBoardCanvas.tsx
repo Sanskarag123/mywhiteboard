@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { EventEmitter } from "stream";
 
 interface Coordinate {
@@ -8,45 +8,68 @@ interface Coordinate {
 
 export default function WhiteBoardCanvas(): JSX.Element {
     const refToCanvas = useRef<HTMLCanvasElement>(null)
-    const [lastCoord, setLastCoord] = useState<Coordinate>({x:0, y:0})
-    const [startLine, setStartLine] = useState<boolean>(true)
+    let lastCoordinate: Coordinate | null = null;
+    let startLine:boolean = true
     let canvas: HTMLCanvasElement | null
     let context: CanvasRenderingContext2D | null
-    const pointOnHover = ( event: React.MouseEvent<HTMLCanvasElement, MouseEvent> ) => {
-        const target: EventTarget | null = event.target
-        if(canvas == null) return
+    const mouseWidth: number = 2
+    const pointOnHover = ( newCoordinate: Coordinate) => {
+        singlePointer(newCoordinate)
+    }
+
+    const getRelativeCoordinate = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>): Coordinate | null => {
+        if(canvas == null) return null;
         let boudingData = canvas.getBoundingClientRect()
         let startX: number = event.clientX - boudingData.left
         let startY: number = event.clientY - boudingData.top
-        if(startX < 0 || startY < 0) return;
-        let startCoordinates: Coordinate
-        if(lastCoord == undefined) {
-            console.log("first")
-            startCoordinates = {x: startX, y: startY}
-        } else {
-            console.log("Second")
-            startCoordinates = lastCoord
+        return {x: startX, y: startY}
+    }
+
+    const pointOnClick = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>): void => {
+        if(startLine) {
+            lastCoordinate = null
         }
-        if(startLine)
-        singlePointer(startX, startY)
+        startLine = !startLine
+        const newCoordinate: Coordinate | null = getRelativeCoordinate(event)
+        if(newCoordinate == null) return;
+        if(newCoordinate.x < 0 || newCoordinate.y < 0) return;
+        lastCoordinate = newCoordinate
+        pointOnHover(newCoordinate)
     }
 
-    const pointOnClick = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        setStartLine(!startLine) 
-        pointOnHover(event)
-    }
 
-
-    const singlePointer = (x: number, y: number) => {
-        console.log(x + " " + y)
+    const singlePointer = (coordinate: Coordinate): void => {
         if(context) {
-            
             context.fillStyle = '#000000'
             context.beginPath()
-            context.arc(x, y, 3, 0, 2*Math.PI)
+            if(!startLine) {
+            context.arc(coordinate.x, coordinate.y, mouseWidth/2, 0, 2*Math.PI)
+            }
             context.fill()
-            setStartLine(true)
-            
+        }
+    }
+
+    const drawLine = (coordinate: Coordinate): void => {
+        if(context) {
+            if(coordinate === null || startLine) return
+            context.beginPath()
+            context.lineWidth = mouseWidth
+            if(lastCoordinate === null) {
+                context.lineTo(coordinate.x, coordinate.y)
+                lastCoordinate = coordinate
+            } 
+            context.lineTo(lastCoordinate.x, lastCoordinate.y);
+            context.lineTo(coordinate.x, coordinate.y)
+            lastCoordinate = coordinate
+            context.stroke();
+        }
+    }
+
+    const onClickdrawLine = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>): void => {
+        if(context) {
+            let coordinate: Coordinate | null = getRelativeCoordinate(event) 
+            if(coordinate == null) return
+            drawLine(coordinate)
         }
     }
 
@@ -55,20 +78,17 @@ export default function WhiteBoardCanvas(): JSX.Element {
     useEffect(() => {
         canvas = refToCanvas.current;
         if(canvas) {
-        let width = canvas.width
-        let height = canvas.height
-        
-        canvas.setAttribute('width', (canvas.width*window.devicePixelRatio)+'')
-        canvas.setAttribute('height', (canvas.height*window.devicePixelRatio)+'')
-        canvas.setAttribute('style', 'width:'+100%+'px; height:'+100%+'px;')
+        canvas.style.width = '100%'
+        canvas.style.height = '100%'
+        canvas.width = canvas.offsetWidth
+        canvas.height = canvas.offsetHeight
         context = canvas.getContext('2d')
-        context?.scale(window.devicePixelRatio, window.devicePixelRatio)
         }
     }, [pointOnClick, pointOnHover])
 
     return(
         <>
-            <canvas className="main-canvas" ref={refToCanvas} onClick={(e) => pointOnClick(e)} onMouseOver={(e) => pointOnHover(e)}></canvas>
+            <canvas className="main-canvas" ref={refToCanvas} onClick={(e) => pointOnClick(e)} onMouseMove={(e) => onClickdrawLine(e)}  ></canvas>
         </>
     )
 }
