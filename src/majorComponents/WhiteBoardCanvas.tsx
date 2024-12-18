@@ -1,6 +1,6 @@
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { EventEmitter } from "stream";
-
+import store from "../store/store";
 interface Coordinate {
     x: number,
     y: number
@@ -12,6 +12,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
     let startLine:boolean = true
     let canvas: HTMLCanvasElement | null
     let context: CanvasRenderingContext2D | null
+    let fillColor: string = '#FFFFFF'
     const mouseWidth: number = 2
     const pointOnHover = ( newCoordinate: Coordinate) => {
         singlePointer(newCoordinate)
@@ -40,7 +41,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
 
     const singlePointer = (coordinate: Coordinate): void => {
         if(context) {
-            context.fillStyle = '#000000'
+            context.fillStyle = fillColor
             context.beginPath()
             if(!startLine) {
             context.arc(coordinate.x, coordinate.y, mouseWidth/2, 0, 2*Math.PI)
@@ -73,10 +74,13 @@ export default function WhiteBoardCanvas(): JSX.Element {
         }
     }
 
-
-
     useEffect(() => {
         canvas = refToCanvas.current;
+        const unsubscribe = store.subscribe(() => {
+            console.log(store.getState().writeTool)
+            if(store.getState().writeTool.toolColor)
+            fillColor = store.getState().writeTool.toolColor
+        })
         if(canvas) {
         canvas.style.width = '100%'
         canvas.style.height = '100%'
