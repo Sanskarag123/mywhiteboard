@@ -6,6 +6,8 @@ $base-radius: 15px
 $base-padding: 15px
 $tools-window-height: 40px
 $tools-width: 60px
+$icon-padding: 5px
+$icon-height: 32px
 body
     background-color: $full-backgroud-color
 .start-window 
@@ -17,6 +19,8 @@ body
     background-color: $tools-window-background
     border-radius: $base-radius
     padding: $base-padding
+    .flex-container
+        margin-inline: 15px
 
 .whiteboard
     margin-top: $main-margin
@@ -26,19 +30,16 @@ body
     cursor: crosshair
 
 .tool-button
-    padding-top: 10px
-    padding-bottom: 10px
-    height: calc($tools-window-height - 2*10px)
-    width: $tools-width
-    text-align: center
+    padding-inline: $icon-padding
+    padding-top: $icon-padding
     background-color: white
     border-radius: $base-radius/2
+    z-index: 1
+
 
 
 .flex-container
     display: flex
-    div
-        margin-inline: 5px
 
 .zoom-buttons
     div
@@ -50,5 +51,16 @@ body
     position: absolute
     top: 2*$main-margin + 2*$base-padding + $tools-window-height
     left: $main-margin
+
+.button-expand
+    position: absolute
+    margin-left: calc( 16px + $icon-padding  )
+    height: calc( $icon-height - 1px)
+    width: 32px
+    padding: $icon-padding
+    background-color: black
+    z-index: 0
+    border-radius: 0  $base-radius/2  $base-radius/2 0
+
 
     

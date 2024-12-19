@@ -9,7 +9,7 @@ export default function EraserTool() {
     return(
         <>  
             <div onClick={() => triggerEraser()}>
-                <WritingToolContainer label="Eraser" ></WritingToolContainer>
+                <WritingToolContainer label="eraser" ></WritingToolContainer>
             </div>
         </>
     )

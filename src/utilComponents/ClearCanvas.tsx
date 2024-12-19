@@ -16,7 +16,7 @@ export default function ClearCanvas() {
     }
     return(<>
         <div onClick={() => handleOnClick()}>
-            <WritingToolContainer label="Clear"></WritingToolContainer>
+            <WritingToolContainer label="clear"></WritingToolContainer>
         </div>
     </>)
 }

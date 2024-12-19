@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import store from "../store/store";
+import WritingToolContainer from "./WritingToolContainer";
 
 export default function ColorController() {
     const [color, setColorvalue] = useState<string>("#00000")
@@ -14,7 +15,8 @@ export default function ColorController() {
     return(
         <>
             <div>
-                <input value={color}  onKeyUp={(e) => handleOnClick(e)}></input>
+                {/* <input value={color}  onKeyUp={(e) => handleOnClick(e)}></input> */}
+                <WritingToolContainer label="colorselector"></WritingToolContainer>
             </div>
         </>
     )

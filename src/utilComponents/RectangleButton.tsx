@@ -9,7 +9,7 @@ export default function Rectangle() {
     }
     return(<>
         <div onClick={() => handleOnClick()}>
-            <WritingToolContainer label="Rect"></WritingToolContainer>
+            <WritingToolContainer label="rect"></WritingToolContainer>
         </div>
     </>)
 }
