@@ -4,7 +4,7 @@ import store from "../store/store";
 
 export default function EraserTool() {
     const triggerEraser = () => {
-        store.dispatch({type:"eraser"})
+        store.dispatch({type:"writeTool", value:"eraser"})
     }
     return(
         <>  

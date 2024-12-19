@@ -7,7 +7,8 @@ export default function PenTool() {
     
     const changePen = () => {
         console.log("clicked")
-        store.dispatch({type:"pen"})
+        store.dispatch({type:"writeTool", value:"pen"})
+
     }
     
     return(

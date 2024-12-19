@@ -4,7 +4,8 @@ import store from "../store/store";
 
 export default function Rectangle() {
     const handleOnClick = () => {
-        store.dispatch({type: "rectangle"})
+        store.dispatch({type:"writeTool", value:"rectangle"})
+        
     }
     return(<>
         <div onClick={() => handleOnClick()}>

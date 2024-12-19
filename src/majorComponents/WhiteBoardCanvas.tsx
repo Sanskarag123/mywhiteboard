@@ -19,8 +19,8 @@ export default function WhiteBoardCanvas(): JSX.Element {
     let fillColor: string = "#000000"
     let rectCoordinate1: Coordinate | null = null
     let rectCoordinate2: Coordinate | null = null
+    let strokeWidth: number = 2
 
-    const mouseWidth: number = 2
 
     // Mouse Handlers
 
@@ -65,17 +65,21 @@ export default function WhiteBoardCanvas(): JSX.Element {
             console.log(currentState)
             currentTool = currentState.writeTool.toolName
             fillColor = currentState.writeTool.toolColor
-            if(context)
+            if(currentState.widthChange) {
+            strokeWidth = parseInt(currentState.widthChange)
+            if(context) {
+            console.log(strokeWidth)
+            context.lineWidth = strokeWidth
+            }
+            }
+            if(context) {
             context.strokeStyle = fillColor
+            }
         }
         startLine = true
     }
 
     // Free draw
-
-    const pointOnHover = ( newCoordinate: Coordinate) => {
-        singlePointer(newCoordinate)
-    }
 
     const getRelativeCoordinate = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>): Coordinate | null => {
         if(canvas == null) return null;
@@ -93,7 +97,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
         startLine = !startLine
         if(newCoordinate.x < 0 || newCoordinate.y < 0) return;
         lastCoordinate = newCoordinate
-        pointOnHover(newCoordinate)
+        singlePointer(newCoordinate)
     }
 
 
@@ -102,7 +106,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
             context.fillStyle = fillColor
             context.beginPath()
             if(!startLine) {
-            context.arc(coordinate.x, coordinate.y, mouseWidth/2, 0, 2*Math.PI)
+            context.arc(coordinate.x, coordinate.y, strokeWidth/2, 0, 2*Math.PI)
             }
             context.fill()
         }
@@ -113,15 +117,16 @@ export default function WhiteBoardCanvas(): JSX.Element {
             if(coordinate === null || startLine) return
             context.beginPath()
             context.strokeStyle = fillColor 
-            context.lineWidth = mouseWidth
+            context.lineWidth = strokeWidth
             if(lastCoordinate === null) {
-                context.lineTo(coordinate.x, coordinate.y)
                 lastCoordinate = coordinate
             } 
             context.lineTo(lastCoordinate.x, lastCoordinate.y);
             context.lineTo(coordinate.x, coordinate.y)
+            context.lineCap = "round"
+            context.stroke()
             lastCoordinate = coordinate
-            context.stroke();
+
         }
     }
 
@@ -139,11 +144,9 @@ export default function WhiteBoardCanvas(): JSX.Element {
         if(firstCoordinate!== null && secondCoordinate !== null && copyContext && !startLine) {
             if(copyCanvas)
             copyContext.clearRect(0,0, copyCanvas?.width, copyCanvas?.height)
+
             copyContext.beginPath()
-            if(rectCoordinate1 !== null && rectCoordinate2 !== null) {
-                
-                copyContext.clearRect(rectCoordinate1.x, rectCoordinate1.y, rectCoordinate2.x-rectCoordinate1.x, rectCoordinate2.y-rectCoordinate1.y)
-            }
+            copyContext.lineWidth = strokeWidth
             copyContext.rect(firstCoordinate.x, firstCoordinate.y, secondCoordinate.x-firstCoordinate.x, secondCoordinate.y-firstCoordinate.y)
             rectCoordinate1 = firstCoordinate
             rectCoordinate2 = secondCoordinate
@@ -200,7 +203,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
         canvas.height = canvas.offsetHeight
         context = canvas.getContext('2d')
         }
-    }, [pointOnClick, pointOnHover])
+    }, [pointOnClick, singlePointer])
 
     return(
         <>

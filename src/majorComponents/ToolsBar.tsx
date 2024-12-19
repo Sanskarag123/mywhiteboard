@@ -4,6 +4,8 @@ import EraserTool from "../utilComponents/EraserTool";
 import ZoomButton from "../utilComponents/ZoomButton";
 import Rectangle from "../utilComponents/RectangleButton";
 import ClearCanvas from "../utilComponents/ClearCanvas";
+import WidthController from "../utilComponents/WidthController";
+import ColorController from "../utilComponents/ColorController";
 
 export default function ToolsBar() {
     return(
@@ -15,6 +17,8 @@ export default function ToolsBar() {
                     <ZoomButton></ZoomButton>
                     <Rectangle></Rectangle>
                     <ClearCanvas></ClearCanvas>
+                    <WidthController></WidthController>
+                    <ColorController></ColorController>
                 </div>
             </div>
         </>

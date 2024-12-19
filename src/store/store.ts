@@ -9,9 +9,19 @@ const initialWriteState: WritingToolType = {
     toolColor: '#000000'
 
 }
+interface CommonAction extends Action {
+    value?: string
+}
 
-const writeToolReducer = (state: WritingToolType = initialWriteState, action: Action) => {
-    switch(action.type) {
+const width: string = "2"
+
+const writeToolReducer = (state: WritingToolType = initialWriteState, action: CommonAction) => {
+    if(action.type === "colorChange") {
+        const newState = {...state, toolColor:action.value? action.value:'#000000'}
+        return newState
+    }
+    if(action.type !== "writeTool") return state
+    switch(action.value) {
         case "pen":
             return{
                 ...state,
@@ -27,7 +37,7 @@ const writeToolReducer = (state: WritingToolType = initialWriteState, action: Ac
         case "rectangle":
             return {
                 ...state,
-                toolName: action.type,
+                toolName: "rectangle",
                 toolColor: "#000000"
             }
         default:
@@ -35,9 +45,17 @@ const writeToolReducer = (state: WritingToolType = initialWriteState, action: Ac
     }
 }
 
+const widthReducer = (state: string = width, action: CommonAction) => {
+    if(action.type === "width")
+    return action.value
+    else
+    return state
+}
+
 const store = configureStore({
   reducer: {
     writeTool: writeToolReducer,
+    widthChange: widthReducer
   },
 })
 
