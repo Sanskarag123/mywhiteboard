@@ -86,7 +86,9 @@ export default function WhiteBoardCanvas(): JSX.Element {
         let boundingData = canvas.getBoundingClientRect()
         let startX: number = event.clientX - boundingData.left
         let startY: number = event.clientY - boundingData.top
-        return {x: startX, y: startY}
+        let heightGradient = canvas.height/canvas.offsetHeight
+        let widthGradient = canvas.width/canvas.offsetWidth
+        return {x: startX*widthGradient, y: startY*heightGradient}
     }
 
     const pointOnClick = (newCoordinate: Coordinate | null): void => {
@@ -142,9 +144,12 @@ export default function WhiteBoardCanvas(): JSX.Element {
 
     const drawRectangle = (firstCoordinate: Coordinate | null, secondCoordinate: Coordinate | null): void => {
         if(firstCoordinate!== null && secondCoordinate !== null && copyContext && !startLine) {
-            if(copyCanvas)
+            if(copyCanvas && canvas) {
             copyContext.clearRect(0,0, copyCanvas?.width, copyCanvas?.height)
-
+            copyCanvas.style.width = canvas.offsetWidth + "px"
+            copyCanvas.style.height = canvas.offsetHeight + "px"
+            }
+            
             copyContext.beginPath()
             copyContext.lineWidth = strokeWidth
             copyContext.rect(firstCoordinate.x, firstCoordinate.y, secondCoordinate.x-firstCoordinate.x, secondCoordinate.y-firstCoordinate.y)
