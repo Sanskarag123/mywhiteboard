@@ -5,6 +5,7 @@ $full-backgroud-color: #e6e9ed
 $base-radius: 15px
 $base-padding: 15px
 $tools-window-height: 40px
+$tools-width: 60px
 body
     background-color: $full-backgroud-color
 .start-window 
@@ -28,7 +29,7 @@ body
     padding-top: 10px
     padding-bottom: 10px
     height: calc($tools-window-height - 2*10px)
-    width: $tools-window-height
+    width: $tools-width
     text-align: center
     background-color: white
     border-radius: $base-radius/2
@@ -36,5 +37,18 @@ body
 
 .flex-container
     display: flex
+    div
+        margin-inline: 5px
+
+.zoom-buttons
+    div
+        padding: 10px
+        background-color: white
+        border-radius: $base-radius/2 
+
+.copy-canvas
+    position: absolute
+    top: 2*$main-margin + 2*$base-padding + $tools-window-height
+    left: $main-margin
 
     

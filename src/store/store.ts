@@ -1,5 +1,6 @@
 import { Action, configureStore } from '@reduxjs/toolkit'
 import WritingToolType from '../interfaces/WritingToolType'
+import { act } from 'react'
 // ...
 
 const initialWriteState: WritingToolType = {
@@ -22,6 +23,12 @@ const writeToolReducer = (state: WritingToolType = initialWriteState, action: Ac
                 ...state,
                 toolName: "eraser",
                 toolColor: "#FFFFFF"
+            }
+        case "rectangle":
+            return {
+                ...state,
+                toolName: action.type,
+                toolColor: "#000000"
             }
         default:
             return state
