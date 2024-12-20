@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import store from "../store/store";
+import WritingToolContainer from "./WritingToolContainer";
 
 export default function WidthController() {
     const [inputvalue, setinputValue] = useState<string>("")
@@ -18,7 +19,8 @@ export default function WidthController() {
     return(
         <>
             <div>
-                <input value={inputvalue} onKeyUp={(e) => handleOnClick(e)} type="number"></input>
+                <WritingToolContainer label="pencilwidth"></WritingToolContainer>
+                {/* <input value={inputvalue} onKeyUp={(e) => handleOnClick(e)} type="number"></input> */}
             </div>
         </>
     )

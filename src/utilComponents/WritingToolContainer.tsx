@@ -1,4 +1,4 @@
-import React from "react";
+import React, { CSSProperties, useState } from "react";
 import WritingToolProps from "../interfaces/WritingToolProps";
 import PenIcon from "./icons/PenIcon";
 import EraserIcon from "./icons/EraserIcon";
@@ -10,6 +10,32 @@ import RightIcon from "./icons/RightIcon";
 import PencilWidth from "./icons/PencilWidth";
 
 export default function WritingToolContainer(props: WritingToolProps) {
+
+    const [buttonStyle, setButtonStyle] = useState<CSSProperties | null>(null)
+    const [arrowStyle, setArrowStyle] = useState<CSSProperties | null>(null)
+
+    const handleAttributeClick = (event: React.MouseEvent ) => {
+        
+    }
+
+    const handleExpandClick = () => {
+
+        if(buttonStyle === null) {
+                const style: CSSProperties = {
+                    "width":"150px",
+                }
+                const styleArrow: CSSProperties = {
+                    "marginLeft":"140px",
+                }
+                setButtonStyle(style)
+                setArrowStyle(styleArrow)
+            } else {
+                setButtonStyle(null)
+                setArrowStyle(null)
+            }
+
+        }
+
     const handleIcons = () => {
         switch(props.label) {
             case "pen":
@@ -30,17 +56,33 @@ export default function WritingToolContainer(props: WritingToolProps) {
                 return props.label
         }
     }
+
+    const uiOnExpand = () => {
+        if(!!buttonStyle) {
+        let strokes: Array<number> = [
+            2, 4, 8, 16, 32
+        ]
+        return strokes
+        } else {
+            return []
+        }
+    }
     return(
         <>
         <div className="flex-container">
-        <div className="tool-button">
-        {
-            handleIcons()
-        }
+        <div className="tool-button" style={!!buttonStyle? buttonStyle:{}}>
+                {handleIcons() }
+                {!!buttonStyle?
+                    uiOnExpand().map((strokeWidth: number, index: number) => {
+                        return <><span className="in-button" style={{"marginLeft":(index)*(16+ 6)+ "px" }}>{strokeWidth}</span></>
+                    })
+                :""}
+    
+            
         </div>
         {
         props.label === "colorselector" || props.label === "pencilwidth" ?
-        <div className="button-expand">
+        <div className="button-expand" style={!!arrowStyle? arrowStyle:{}} onClick={() => handleExpandClick()} >
             <RightIcon></RightIcon>
         </div> :""
         }
