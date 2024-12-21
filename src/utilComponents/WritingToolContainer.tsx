@@ -8,14 +8,34 @@ import ClearAllIcon from "./icons/ClearAllIcon";
 import ColorIcons from "./icons/ColorIcons";
 import RightIcon from "./icons/RightIcon";
 import PencilWidth from "./icons/PencilWidth";
+import Circle from "./icons/Circle";
+import ActiveController from "../interfaces/ActiveController";
+import store from "../store/store";
 
 export default function WritingToolContainer(props: WritingToolProps) {
 
     const [buttonStyle, setButtonStyle] = useState<CSSProperties | null>(null)
     const [arrowStyle, setArrowStyle] = useState<CSSProperties | null>(null)
 
-    const handleAttributeClick = (event: React.MouseEvent ) => {
-        
+    const [strokeWidth, setStrokeWidth] = useState<ActiveController[] | null>(props.strokeWidth? props.strokeWidth: null)
+    const [colorsState, setColorsState] = useState(props.colors? props.colors: null)
+
+    const handleAttributeClick = (value: string) => {
+        store.dispatch({type:"width",value: value})
+        if(strokeWidth) {
+        setStrokeWidth(strokeWidth.map((itr: ActiveController) => {
+            if(itr.value === value) {
+                itr.active = true
+            } else {
+                itr.active = false
+            }
+            return itr
+        }))
+        }
+    }
+
+    const handleColorClick = (colorvalue: string) => {
+        store.dispatch({type:"colorChange", value:colorvalue})
     }
 
     const handleExpandClick = () => {
@@ -59,26 +79,33 @@ export default function WritingToolContainer(props: WritingToolProps) {
 
     const uiOnExpand = () => {
         if(!!buttonStyle) {
-        let strokes: Array<number> = [
-            2, 4, 8, 16, 32
-        ]
+
+        if(strokeWidth) {
+        let strokes = strokeWidth.map( (strokeWidth: ActiveController,index: number) => {
+            return <><span className="in-button" style={{"marginLeft":(index)*(16+ 6)+ "px","backgroundColor":strokeWidth.active?"rgba(2,2 ,2 , 0.2)":""}} onClick={() => handleAttributeClick(strokeWidth.value)}>{strokeWidth.value}</span></>
+        })
         return strokes
+        }
+
+        if(props.colors) {
+            let colors = props.colors.map((color: ActiveController, index: number) => {
+                return <><Circle color={color.value} onClick={handleColorClick}></Circle></>
+            })
+            return colors;
+        }
         } else {
             return []
         }
     }
     return(
         <>
+        <div style={props.label === "colorselector" || props.label === "pencilwidth" ? {"marginRight":"20px"}:{}}>
         <div className="flex-container">
         <div className="tool-button" style={!!buttonStyle? buttonStyle:{}}>
                 {handleIcons() }
                 {!!buttonStyle?
-                    uiOnExpand().map((strokeWidth: number, index: number) => {
-                        return <><span className="in-button" style={{"marginLeft":(index)*(16+ 6)+ "px" }}>{strokeWidth}</span></>
-                    })
+                    uiOnExpand()
                 :""}
-    
-            
         </div>
         {
         props.label === "colorselector" || props.label === "pencilwidth" ?
@@ -86,6 +113,7 @@ export default function WritingToolContainer(props: WritingToolProps) {
             <RightIcon></RightIcon>
         </div> :""
         }
+        </div>
         </div>
         </>
     )

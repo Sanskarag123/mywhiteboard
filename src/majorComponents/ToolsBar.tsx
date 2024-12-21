@@ -11,7 +11,7 @@ export default function ToolsBar() {
     return(
         <>
             <div className="tools-window">
-                <div className="flex-container">
+                <div className="flex-container tools-container">
                     <PenTool></PenTool>
                     <EraserTool></EraserTool>
                     {/* <ZoomButton></ZoomButton> */}

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import store from "../store/store";
 import WritingToolContainer from "./WritingToolContainer";
-
+interface ActiveController {
+    value: string,
+    active: boolean
+}
 export default function WidthController() {
     const [inputvalue, setinputValue] = useState<string>("")
     const handleOnClick =  (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -15,12 +18,16 @@ export default function WidthController() {
         }
         
     }
-
+    const widths: ActiveController[] = [
+        {value:"2", active: true},
+        {value:"4", active: false},
+        {value:"8", active: false},
+        {value:"16", active: false},
+    ]
     return(
         <>
             <div>
-                <WritingToolContainer label="pencilwidth"></WritingToolContainer>
-                {/* <input value={inputvalue} onKeyUp={(e) => handleOnClick(e)} type="number"></input> */}
+                <WritingToolContainer label="pencilwidth" strokeWidth={widths}></WritingToolContainer>
             </div>
         </>
     )

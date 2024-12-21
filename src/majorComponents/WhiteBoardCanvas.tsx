@@ -10,7 +10,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
     const refToCanvas = useRef<HTMLCanvasElement>(null)
     const refToCopyCanvas = useRef<HTMLCanvasElement>(null)
     let lastCoordinate: Coordinate | null = null;
-    let startLine:boolean = true
+    let startTool:boolean = true
     let canvas: HTMLCanvasElement | null
     let copyCanvas: HTMLCanvasElement | null
     let context: CanvasRenderingContext2D | null
@@ -32,7 +32,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
                 pointOnClick(currentCoord)
                 break
             case "rectangle":
-                startAndEndRectangle(currentCoord, canvas)
+                startAndEndSymbol(currentCoord, canvas)
                 break
             default:
                 pointOnClick(currentCoord)
@@ -48,7 +48,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
                 onClickdrawLine(event)
                 break
             case "rectangle":
-                drawRectangle(lastCoordinate, currentCoord)
+                drawSymbol(lastCoordinate, currentCoord, "rectangle")
                 break
             default:
                 return
@@ -57,29 +57,11 @@ export default function WhiteBoardCanvas(): JSX.Element {
 
     // Subscription handler
 
-    const handleSubscription = () => {
-        
-        if(store.getState().writeTool) {
-            
-            const currentState = store.getState()
-            console.log(currentState)
-            currentTool = currentState.writeTool.toolName
-            fillColor = currentState.writeTool.toolColor
-            if(currentState.widthChange) {
-            strokeWidth = parseInt(currentState.widthChange)
-            if(context) {
-            console.log(strokeWidth)
-            context.lineWidth = strokeWidth
-            }
-            }
-            if(context) {
-            context.strokeStyle = fillColor
-            }
-        }
-        startLine = true
-    }
 
-    // Free draw
+
+    /************************************************************************************
+     * Get Relative coordinates on current canvas even with zoom and zoom out 
+     **********************************************************************************/
 
     const getRelativeCoordinate = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>): Coordinate | null => {
         if(canvas == null) return null;
@@ -91,12 +73,16 @@ export default function WhiteBoardCanvas(): JSX.Element {
         return {x: startX*widthGradient, y: startY*heightGradient}
     }
 
+    /*************************************************************
+     * Used of starting pen type tools and eraser
+     ***************************************************************/
+
     const pointOnClick = (newCoordinate: Coordinate | null): void => {
         if(newCoordinate == null) return;
-        if(startLine) {
+        if(startTool) {
             lastCoordinate = null
         }
-        startLine = !startLine
+        startTool = !startTool
         if(newCoordinate.x < 0 || newCoordinate.y < 0) return;
         lastCoordinate = newCoordinate
         singlePointer(newCoordinate)
@@ -107,7 +93,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
         if(context) {
             context.fillStyle = fillColor
             context.beginPath()
-            if(!startLine) {
+            if(!startTool) {
             context.arc(coordinate.x, coordinate.y, strokeWidth/2, 0, 2*Math.PI)
             }
             context.fill()
@@ -116,7 +102,7 @@ export default function WhiteBoardCanvas(): JSX.Element {
 
     const drawLine = (coordinate: Coordinate): void => {
         if(context) {
-            if(coordinate === null || startLine) return
+            if(coordinate === null || startTool) return
             context.beginPath()
             context.strokeStyle = fillColor 
             context.lineWidth = strokeWidth
@@ -140,40 +126,51 @@ export default function WhiteBoardCanvas(): JSX.Element {
         }
     }
 
-    // Rectangle functions
+    /**************************************************************************
+     * Generic way to draw any shape to canvas
+     **************************************************************************/
 
-    const drawRectangle = (firstCoordinate: Coordinate | null, secondCoordinate: Coordinate | null): void => {
-        if(firstCoordinate!== null && secondCoordinate !== null && copyContext && !startLine) {
+    const drawSymbol = (firstCoordinate: Coordinate | null, secondCoordinate: Coordinate | null, shapeType: string): void => {
+        if(firstCoordinate!== null && secondCoordinate !== null && copyContext && !startTool) {
             if(copyCanvas && canvas) {
             copyContext.clearRect(0,0, copyCanvas?.width, copyCanvas?.height)
-            copyCanvas.style.width = canvas.offsetWidth + "px"
-            copyCanvas.style.height = canvas.offsetHeight + "px"
+            copyContext.strokeStyle = fillColor
             }
-            
             copyContext.beginPath()
             copyContext.lineWidth = strokeWidth
-            copyContext.rect(firstCoordinate.x, firstCoordinate.y, secondCoordinate.x-firstCoordinate.x, secondCoordinate.y-firstCoordinate.y)
+            switch(shapeType) {
+                case "rectangle":
+                    drawRectangle(copyContext, firstCoordinate,secondCoordinate)
+                    break
+                default:
+                    drawRectangle(copyContext, firstCoordinate,secondCoordinate)
+            }
+
             rectCoordinate1 = firstCoordinate
             rectCoordinate2 = secondCoordinate
             copyContext.stroke()
         }
     }
 
-    const startAndEndRectangle = (startCoordinate: Coordinate | null, mainCanvas?: HTMLCanvasElement | null): void => {
-        copyCanvas = refToCopyCanvas.current
+    const drawRectangle = (copyContext: CanvasRenderingContext2D, firstCoordinate: Coordinate, secondCoordinate: Coordinate) => {
+        copyContext.rect(firstCoordinate.x, firstCoordinate.y, secondCoordinate.x-firstCoordinate.x, secondCoordinate.y-firstCoordinate.y)
+    }   
+
+
+    const startAndEndSymbol = (startCoordinate: Coordinate | null, mainCanvas?: HTMLCanvasElement | null): void => {
         if(mainCanvas && copyCanvas) {
             setCopyCanvasAndGetContext(mainCanvas, copyCanvas)
             if(copyContext) showOrHideCopyCanvas(copyCanvas)
         }
         
         if(startCoordinate == null) return
-        if(startLine) {
+        if(startTool) {
             lastCoordinate = startCoordinate
         } else {
             lastCoordinate = null
             if(context) copyCanvasPath(context)
         }
-        startLine = !startLine
+        startTool = !startTool
     }
 
     const showOrHideCopyCanvas = (copyCanvas: HTMLCanvasElement) => {
@@ -187,27 +184,70 @@ export default function WhiteBoardCanvas(): JSX.Element {
         copyContext = copyCanvas.getContext('2d')
     }
 
+    /**********************************************************
+     * Copies shape to main canvas
+     *************************************************************/
+
     const copyCanvasPath = (mainContext: CanvasRenderingContext2D) => {
         if(rectCoordinate1 !== null && rectCoordinate2 !== null) {
         mainContext.beginPath()
-        mainContext.strokeStyle = fillColor  
-        mainContext.rect(rectCoordinate1.x, rectCoordinate1.y, rectCoordinate2.x-rectCoordinate1.x, rectCoordinate2.y-rectCoordinate1.y)
+        mainContext.strokeStyle = fillColor 
+        switch(currentTool) {
+            case "rectangle":
+                mainContext.rect(rectCoordinate1.x, rectCoordinate1.y, rectCoordinate2.x-rectCoordinate1.x, rectCoordinate2.y-rectCoordinate1.y)
+                break
+            default:
+                return
+                
+        }
         mainContext.stroke() 
         }
     }
 
+    /***********************************************************************************
+     * Handles the initialiatin of canvas and copy canvas
+     ********************************************************************************/
+
+    const handleCanvasInitialization = () => {
+        canvas = refToCanvas.current
+        copyCanvas = refToCopyCanvas.current
+        if(canvas) {
+            canvas.style.width = '100%'
+            canvas.style.height = '100%'
+            canvas.width = canvas.offsetWidth
+            canvas.height = canvas.offsetHeight
+            context = canvas.getContext('2d')
+            if(copyCanvas ) {
+                copyCanvas.width = canvas.offsetWidth
+                copyCanvas.height = canvas.offsetHeight
+                copyContext = copyCanvas.getContext('2d')
+            }
+        }
+    }
+
+    /***********************************************************************************
+     * Handles the subscription to the redux store
+     ********************************************************************************/
+
+    const handleSubscription = () => {
+        const currentState = store.getState()
+        if(currentState) {  
+            currentTool = currentState.writeTool.toolName
+            fillColor = currentState.writeTool.toolColor
+            if(currentState.widthChange) strokeWidth = parseInt(currentState.widthChange)
+            if(context) {
+                context.lineWidth = strokeWidth
+                context.strokeStyle = fillColor
+            }
+        }
+        startTool = true
+    }
+
     useEffect(() => {
-        canvas = refToCanvas.current;
+        handleCanvasInitialization()
         const unsubscribe = store.subscribe(() => {
             handleSubscription()
         })
-        if(canvas) {
-        canvas.style.width = '100%'
-        canvas.style.height = '100%'
-        canvas.width = canvas.offsetWidth
-        canvas.height = canvas.offsetHeight
-        context = canvas.getContext('2d')
-        }
     }, [pointOnClick, singlePointer])
 
     return(

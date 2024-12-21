@@ -26,7 +26,7 @@ const writeToolReducer = (state: WritingToolType = initialWriteState, action: Co
             return{
                 ...state,
                 toolName: "pen",
-                toolColor: "#000000"
+                toolColor: state.toolColor === "#FFFFFF" ? "#000000" : state.toolColor
             }
         case "eraser":
             return {
@@ -38,7 +38,8 @@ const writeToolReducer = (state: WritingToolType = initialWriteState, action: Co
             return {
                 ...state,
                 toolName: "rectangle",
-                toolColor: "#000000"
+                toolColor: state.toolColor === "#FFFFFF" ? "#000000" : state.toolColor
+
             }
         default:
             return state

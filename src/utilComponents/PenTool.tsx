@@ -6,7 +6,7 @@ import WritingToolContainer from "./WritingToolContainer";
 export default function PenTool() {
     
     const [color, setColor] = useState("#000000")
-
+    const [shadow, setShadow] = useState({})
     const changePen = () => {
         console.log("clicked")
         store.dispatch({type:"writeTool", value:"pen"})
@@ -26,7 +26,7 @@ export default function PenTool() {
     
     return(
         <>
-            <div onClick={() => changePen()}>
+            <div onClick={() => changePen()} style={shadow}>
             <WritingToolContainer label="pen" toolColor={color}></WritingToolContainer>
             </div>
         </>
